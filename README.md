@@ -1,3 +1,3 @@
 # pokemon-team-builder
 
-# jin
+# jin (koow)
