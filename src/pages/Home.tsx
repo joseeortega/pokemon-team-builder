@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getPokemons } from "../services/PokeApi";
 
 function Home() {
-  const [pokemons, setPokemons] = useState([]);
+  const [pokemons, setPokemons] = useState<any[]>([]);
 
   const entryStyle = {};
 
@@ -11,9 +11,7 @@ function Home() {
     getPokemons({ limit: 10, offset: 0 }).then(
       (
         response: AxiosResponse<{
-          data: {
-            results: any[];
-          };
+          results: any[];
         }>
       ) => {
         setPokemons(response.data.results);
