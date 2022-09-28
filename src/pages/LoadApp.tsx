@@ -1,45 +1,46 @@
-import { CSSProperties, useState } from "react";
+import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import { COOKIE_NO_LOAD_SCREEN } from "../defs/constants";
+import { AppCookies } from "../models/cookie.model";
+import Home from "./Home";
+import Intro from "./Intro";
 
-const getRandomImage = () => {
-  return RANDOM_IMAGES[getRandomNumber(0, RANDOM_IMAGES.length)];
-};
+function LoadApp() {
+  const [cookies, setCookie, removeCookie] = useCookies([
+    COOKIE_NO_LOAD_SCREEN,
+  ]);
 
-const getRandomNumber = (min: number, max: number) => {
-  return Math.floor(Math.random() * max) + min;
-};
+  const [loading, setLoading] = useState(getInitialLoadingValue(cookies));
 
-const RANDOM_IMAGES = [
-  "https://images3.alphacoders.com/127/thumb-1920-127579.jpg",
-  "https://wallpapercave.com/wp/wp2763459.jpg",
-  "https://i.pinimg.com/originals/7b/79/65/7b79657c3574b2d64a5f0a4d9402b41d.jpg",
-];
+  function getInitialLoadingValue(cookies: AppCookies) {
+    return cookies?.[COOKIE_NO_LOAD_SCREEN] ? 100 : 0;
+  }
 
-function LoadApp(props: { loading: number }) {
-  const [randomImage] = useState(getRandomImage());
-
-  const getRandomStyle = () => {
-    return {
-      ...entryStyle,
-      backgroundImage: `url(${randomImage})`,
-    };
+  const disableLoadingScreen = () => {
+    setCookie(COOKIE_NO_LOAD_SCREEN, true, []);
   };
 
-  const entryStyle: CSSProperties = {
-    height: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
+  const enableLoadingScreen = () => {
+    removeCookie(COOKIE_NO_LOAD_SCREEN);
   };
+
+  useEffect(() => {
+    console.log("App -> cookies", cookies);
+    setTimeout(() => {
+      if (loading !== 100) {
+        setLoading(loading + 20);
+      }
+    }, 700);
+  }, [loading]);
 
   return (
-    <div id="LoadApp" style={getRandomStyle()}>
-      <div>
-        <h1>Pokemon Team Builder</h1>
-        <h3>Developed by Jose Ortega Marquez</h3>
-        <p>Loading.. {props.loading}%</p>
-        <button>Disable loading screen</button>
-      </div>
-    </div>
+    <main>
+      {loading < 100 ? (
+        <Intro loading={loading} disableLoadingScreen={disableLoadingScreen} />
+      ) : (
+        <Home enableLoadingScreen={enableLoadingScreen} />
+      )}
+    </main>
   );
 }
 
