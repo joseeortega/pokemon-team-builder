@@ -1,4 +1,5 @@
 import { CSSProperties, useState } from "react";
+import { Button } from "primereact/button";
 
 const getRandomImage = () => {
   return RANDOM_IMAGES[getRandomNumber(0, RANDOM_IMAGES.length)];
@@ -37,9 +38,9 @@ function Intro(props: { loading: number; disableLoadingScreen: () => void }) {
         <h1>Pokemon Team Builder</h1>
         <h3>Developed by Jose Ortega Marquez</h3>
         <p>Loading.. {props.loading}%</p>
-        <button onClick={props.disableLoadingScreen}>
-          Disable loading screen
-        </button>
+        <Button onClick={props.disableLoadingScreen}>
+          Button loading screen
+        </Button>
       </div>
     </div>
   );

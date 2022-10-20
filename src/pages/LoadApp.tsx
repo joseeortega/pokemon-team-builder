@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import { Route, Routes } from "react-router-dom";
 import { COOKIE_NO_LOAD_SCREEN } from "../defs/constants";
 import { AppCookies } from "../models/cookie.model";
 import Home from "./Home";
 import Intro from "./Intro";
+import Teams from "./Teams";
 
 function LoadApp() {
   const [cookies, setCookie, removeCookie] = useCookies([
@@ -38,7 +40,13 @@ function LoadApp() {
       {loading < 100 ? (
         <Intro loading={loading} disableLoadingScreen={disableLoadingScreen} />
       ) : (
-        <Home enableLoadingScreen={enableLoadingScreen} />
+        <Routes>
+          <Route
+            path="/"
+            element={<Home enableLoadingScreen={enableLoadingScreen} />}
+          />
+          <Route path="/teams" element={<Teams />} />
+        </Routes>
       )}
     </main>
   );

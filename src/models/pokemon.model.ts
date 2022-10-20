@@ -67,3 +67,21 @@ export interface PokeType {
   slot: number;
   type: PokeTypeInfo;
 }
+
+export enum POKE_STAT_INDEX {
+  HP=0,
+  ATTACK=1,
+  DEFENSE=2,
+  SPECIAL_ATTACK=3,
+  SPECIAL_DEFENSE=4,
+  SPEED=5
+}
+
+export enum POKE_STAT_HIGHEST_POINT {
+  HP=255,
+  ATTACK=190,
+  DEFENSE=230,
+  SPECIAL_ATTACK=194,
+  SPECIAL_DEFENSE=230,
+  SPEED=180,
+}
