@@ -18,3 +18,7 @@ export const getPokemons = async (pagination: {
 export const getPokemon = async (name: string) => {
   return AxiosInstance.getInstance().get(`pokemon/${name}`);
 };
+
+export const getTypes = async () => {
+  return AxiosInstance.getInstance().get(`type`);
+};

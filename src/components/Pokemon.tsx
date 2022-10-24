@@ -3,22 +3,39 @@ import { Badge } from "primereact/badge";
 import { Card } from "primereact/card";
 import { Chart } from "primereact/chart";
 import { Slider } from "primereact/slider";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   IPokemon,
+  IPokemonDisplay,
   IPokemonMini,
-  PokeType,
+  IPokeType,
+  IPokeTypeDisplay,
   POKE_STAT_HIGHEST_POINT,
   POKE_STAT_INDEX,
+  POKE_TYPE_IMAGE,
 } from "../models/pokemon.model";
 import { getPokemon } from "../services/PokeApi";
+import { PokemonContext } from "./PokemonContext";
 
 function Pokemon(props: { pokemon: IPokemonMini }) {
-  const [pokemon, setPokemon] = useState<IPokemon>();
+  const [pokemon, setPokemon] = useState<IPokemonDisplay>();
+  const { pokemonTypes } = useContext(PokemonContext);
 
   useEffect(() => {
     getPokemon(props.pokemon.name).then((response: AxiosResponse<IPokemon>) => {
-      setPokemon(response.data);
+      setPokemon({
+        id: response.data.id,
+        name: response.data.name,
+        stats: response.data.stats,
+        types: response.data.types.map((pokemonType: IPokeType) => {
+          return {
+            name: pokemonType.type.name,
+            url: pokemonType.type.url,
+            imageUrl: (POKE_TYPE_IMAGE as any)[pokemonType.type.name],
+          } as IPokeTypeDisplay;
+        }),
+        sprites: response.data.sprites,
+      } as IPokemonDisplay);
     });
   }, []);
 
@@ -85,13 +102,18 @@ function Pokemon(props: { pokemon: IPokemonMini }) {
         <Card
           style={{ border: "0.2em solid #5c5c5c" }}
           title={pokemon?.name}
-          subTitle={pokemon?.types
-            .map(
-              (pokeType: PokeType, index: number) =>
-                pokeType.type.name.charAt(0).toUpperCase() +
-                pokeType.type.name.slice(1)
-            )
-            .join(", ")}
+          subTitle={pokemon?.types.map(
+            (pokeType: IPokeTypeDisplay, index: number) => {
+              return (
+                <span key={index}>
+                  <img
+                    src={pokeType.imageUrl}
+                    style={{ width: "20px", margin: "2.5px" }}
+                  ></img>
+                </span>
+              );
+            }
+          )}
           header={header}
         >
           {powerBar(

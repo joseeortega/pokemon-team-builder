@@ -6,6 +6,8 @@ import { AppCookies } from "../models/cookie.model";
 import Home from "./Home";
 import Intro from "./Intro";
 import Teams from "./Teams";
+import CreateTeam from "./CreateTeam";
+import { PokemonContextProvider } from "../components/PokemonContext";
 
 function LoadApp() {
   const [cookies, setCookie, removeCookie] = useCookies([
@@ -40,13 +42,17 @@ function LoadApp() {
       {loading < 100 ? (
         <Intro loading={loading} disableLoadingScreen={disableLoadingScreen} />
       ) : (
-        <Routes>
-          <Route
-            path="/"
-            element={<Home enableLoadingScreen={enableLoadingScreen} />}
-          />
-          <Route path="/teams" element={<Teams />} />
-        </Routes>
+        <PokemonContextProvider>
+          <Routes>
+            <Route path="/" element={<Teams />} />
+            <Route path="/teams" element={<Teams />} />
+            <Route path="/create-team" element={<CreateTeam />} />
+            <Route
+              path="/home"
+              element={<Home enableLoadingScreen={enableLoadingScreen} />}
+            />
+          </Routes>
+        </PokemonContextProvider>
       )}
     </main>
   );
