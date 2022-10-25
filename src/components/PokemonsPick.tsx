@@ -22,6 +22,7 @@ function PokemonsPick() {
   const POKEMON_QUANTITY_DISPLAY = 10;
 
   const [pokemons, setPokemons] = useState<IPokemonMini[]>([]);
+  const [pokemonsFiltered, setPokemonsFiltered] = useState<IPokemonMini[]>([]);
   const [totalPokemon, setPokemonLength] = useState<number>();
 
   const [pokemonFilter, setPokemonFilter] = useState<IPokemonFilter>({
@@ -50,6 +51,15 @@ function PokemonsPick() {
     getNextPokemonDisplay();
   }, [pokemons, displayPagination]);
 
+  useEffect(() => {
+    const newPagination = {
+      limit: POKEMON_QUANTITY_DISPLAY,
+      offset: 0,
+    };
+    setPokemonsDisplay([]);
+    setDisplayPagination(newPagination);
+  }, [pokemonsFiltered]);
+
   const fetchAllPokemons = () => {
     getPokemons(ALL_POKEMONS_PAGINATION).then(
       (
@@ -59,7 +69,7 @@ function PokemonsPick() {
         }>
       ) => {
         setPokemons(response.data.results);
-        debugger;
+        setPokemonsFiltered(response.data.results);
         setPokemonLength(response.data.count);
       }
     );
@@ -68,7 +78,7 @@ function PokemonsPick() {
   const getNextPokemonDisplay = () => {
     setPokemonsDisplay([
       ...pokemonsDisplay,
-      ...chunkPokemonByPagination(displayPagination, pokemons),
+      ...chunkPokemonByPagination(displayPagination, pokemonsFiltered),
     ]);
   };
 
@@ -100,9 +110,9 @@ function PokemonsPick() {
   };
 
   const chunkPokemonByPagination = (pagination: IPagination, data: any[]) => {
-    return [...data].splice(
+    return [...data].slice(
       pagination.offset,
-      pagination.offset + pagination.limit + 1
+      pagination.offset + pagination.limit
     );
   };
 
@@ -116,22 +126,27 @@ function PokemonsPick() {
   };
 
   const filterPokemon = (pokemonFilter: IPokemonFilter) => {
-    debugger;
     setPokemonFilter(pokemonFilter);
+    filterPokemonEffect(pokemonFilter);
+  };
+
+  const filterPokemonEffect = (pokemonFilter: IPokemonFilter) => {
+    /*console.log("pokemons", pokemons);
+    console.log("totalPokemon", totalPokemon);
+    console.log("pokemonFilter", pokemonFilter);
+    console.log("displayPagination", displayPagination);
+    console.log("pokemonsDisplay", pokemonsDisplay);
+
+    console.log("----------------------------------");*/
+
     const pokemonsFiltered: IPokemonMini[] = getFilteredPokemon(
       pokemons,
       pokemonFilter
     );
     console.log("pokemonsFiltered", pokemonsFiltered);
     console.log("pokemonFilter.name", pokemonFilter.name);
-    const newPagination = {
-      limit: POKEMON_QUANTITY_DISPLAY,
-      offset: 0,
-    };
-    setPokemonsDisplay(
-      chunkPokemonByPagination(newPagination, pokemonsFiltered)
-    );
-    /*setDisplayPagination(newPagination);*/
+
+    setPokemonsFiltered(pokemonsFiltered);
   };
 
   return (

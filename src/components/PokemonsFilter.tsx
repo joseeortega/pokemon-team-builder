@@ -22,6 +22,7 @@ function PokemonsFilter(props: {
   filterPokemon: (pokemonFilter: IPokemonFilter) => void;
 }) {
   const { pokemonTypes, loaded } = useContext(PokemonContext);
+  const [test, setTest] = useState<string>("hola");
 
   const {
     register,
@@ -38,7 +39,6 @@ function PokemonsFilter(props: {
     mode: "onChange",
   });
 
-  debugger;
   const { onChange, onBlur, name, ref } = register("pokemonTypes");
 
   useEffect(() => {
@@ -46,21 +46,27 @@ function PokemonsFilter(props: {
   }, [loaded]);
 
   useEffect(() => {
+    console.log("subscribe to watch");
     const subscription = watch(() => {
-      const formValues = getValues();
-
-      const pokemonFilter: IPokemonFilter = {
-        name: formValues.name,
-        types: formValues.pokemonTypes.map(
-          (pokemonType: IPokeTypeDisplay) => pokemonType.name
-        ),
-      };
-      props.filterPokemon(pokemonFilter);
+      filter();
     });
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [props]);
+  //was necesary to set props as dependency cause only was subscriben first time using method received in props and was using old parent state values
+
+  const filter = () => {
+    const formValues = getValues();
+
+    const pokemonFilter: IPokemonFilter = {
+      name: formValues.name,
+      types: formValues.pokemonTypes.map(
+        (pokemonType: IPokeTypeDisplay) => pokemonType.name
+      ),
+    };
+    props.filterPokemon(pokemonFilter);
+  };
 
   const selectAllTypes = () => {
     setValue("pokemonTypes", [...pokemonTypes], {
