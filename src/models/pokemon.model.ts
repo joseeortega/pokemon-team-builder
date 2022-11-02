@@ -106,7 +106,6 @@ export interface IPokeType {
 
 export interface IPokemonFilter {
   name: string;
-  types: string[];
 }
 
 export enum POKE_STAT_INDEX {

@@ -44,13 +44,15 @@ function LoadApp() {
       ) : (
         <PokemonContextProvider>
           <Routes>
-            <Route path="/" element={<Teams />} />
-            <Route path="/teams" element={<Teams />} />
-            <Route path="/create-team" element={<CreateTeam />} />
             <Route
-              path="/home"
-              element={<Home enableLoadingScreen={enableLoadingScreen} />}
+              path="/"
+              element={<Teams enableLoadingScreen={enableLoadingScreen} />}
             />
+            <Route
+              path="/teams"
+              element={<Teams enableLoadingScreen={enableLoadingScreen} />}
+            />
+            <Route path="/create-team" element={<CreateTeam />} />
           </Routes>
         </PokemonContextProvider>
       )}

@@ -17,9 +17,11 @@ import {
 import { getPokemon } from "../services/PokeApi";
 import { PokemonContext } from "./PokemonContext";
 
-function Pokemon(props: { pokemon: IPokemonMini }) {
+function Pokemon(props: {
+  pokemon: IPokemonMini;
+  showAdvancedPokeInfo: boolean;
+}) {
   const [pokemon, setPokemon] = useState<IPokemonDisplay>();
-  const { pokemonTypes } = useContext(PokemonContext);
 
   useEffect(() => {
     getPokemon(props.pokemon.name).then((response: AxiosResponse<IPokemon>) => {
@@ -116,37 +118,41 @@ function Pokemon(props: { pokemon: IPokemonMini }) {
           )}
           header={header}
         >
-          {powerBar(
-            pokemon.stats[POKE_STAT_INDEX.HP].base_stat,
-            "HP",
-            POKE_STAT_HIGHEST_POINT.HP
+          {props.showAdvancedPokeInfo && (
+            <div>
+              {powerBar(
+                pokemon.stats[POKE_STAT_INDEX.HP].base_stat,
+                "HP",
+                POKE_STAT_HIGHEST_POINT.HP
+              )}
+              {powerBar(
+                pokemon.stats[POKE_STAT_INDEX.ATTACK].base_stat,
+                "Attack",
+                POKE_STAT_HIGHEST_POINT.ATTACK
+              )}
+              {powerBar(
+                pokemon.stats[POKE_STAT_INDEX.DEFENSE].base_stat,
+                "Defense",
+                POKE_STAT_HIGHEST_POINT.DEFENSE
+              )}
+              {powerBar(
+                pokemon.stats[POKE_STAT_INDEX.SPECIAL_ATTACK].base_stat,
+                "S. Attack",
+                POKE_STAT_HIGHEST_POINT.SPECIAL_ATTACK
+              )}
+              {powerBar(
+                pokemon.stats[POKE_STAT_INDEX.SPECIAL_DEFENSE].base_stat,
+                "S. Defense",
+                POKE_STAT_HIGHEST_POINT.SPECIAL_DEFENSE
+              )}
+              {powerBar(
+                pokemon.stats[POKE_STAT_INDEX.SPEED].base_stat,
+                "Speed",
+                POKE_STAT_HIGHEST_POINT.SPEED
+              )}
+              {/* {powerChat()} */}
+            </div>
           )}
-          {powerBar(
-            pokemon.stats[POKE_STAT_INDEX.ATTACK].base_stat,
-            "Attack",
-            POKE_STAT_HIGHEST_POINT.ATTACK
-          )}
-          {powerBar(
-            pokemon.stats[POKE_STAT_INDEX.DEFENSE].base_stat,
-            "Defense",
-            POKE_STAT_HIGHEST_POINT.DEFENSE
-          )}
-          {powerBar(
-            pokemon.stats[POKE_STAT_INDEX.SPECIAL_ATTACK].base_stat,
-            "S. Attack",
-            POKE_STAT_HIGHEST_POINT.SPECIAL_ATTACK
-          )}
-          {powerBar(
-            pokemon.stats[POKE_STAT_INDEX.SPECIAL_DEFENSE].base_stat,
-            "S. Defense",
-            POKE_STAT_HIGHEST_POINT.SPECIAL_DEFENSE
-          )}
-          {powerBar(
-            pokemon.stats[POKE_STAT_INDEX.SPEED].base_stat,
-            "Speed",
-            POKE_STAT_HIGHEST_POINT.SPEED
-          )}
-          {/* {powerChat()} */}
         </Card>
       )}
     </div>

@@ -1,20 +1,36 @@
 import { Button } from "primereact/button";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   IPokemonMini,
   IPokeTeam,
   IPokeTeamEdit,
   IPokemon,
+  IPokeType,
+  POKE_TYPE_IMAGE,
+  IPokeTypeDisplay,
+  IPokemonDisplay,
 } from "../models/pokemon.model";
 import { FieldValues, useForm } from "react-hook-form";
 import pokemon from "./Pokemon";
+import PokemonsPick from "./PokemonsPick";
+import { getPokemon } from "../services/PokeApi";
+import { AxiosResponse } from "axios";
+import { PokemonContext } from "./PokemonContext";
+import { useNavigate } from "react-router-dom";
+import PokemonTeam from "./PokemonTeam";
 
 function Team() {
+  const { teams } = useContext(PokemonContext);
+
   const [pokeTeam, setPokeTeam] = useState<IPokeTeamEdit>({
     name: "",
     id: "",
     pokemons: [],
   });
+
+  const [slotSelected, setSlotSelected] = useState<number>(0);
+
+  let navigate = useNavigate();
 
   const {
     register,
@@ -25,14 +41,19 @@ function Team() {
     setValue,
   } = useForm<{ name: string; pokemons: IPokemon[] }>({
     defaultValues: {
-      name: "klk",
+      name: "",
       pokemons: [],
     },
     mode: "onChange",
   });
 
+  const { addTeam } = useContext(PokemonContext);
+
   const isFullTeam = (pokemons: IPokemon[]) =>
     pokemons.length == 6 && pokemons.every((pokemon: IPokemon) => pokemon.name);
+
+  const alreadyExistsTeamName = (name: string) =>
+    !teams.find((team: IPokeTeam) => team.name == name);
 
   const { onChange, onBlur, name, ref } = register("pokemons", {
     required: true,
@@ -51,155 +72,42 @@ function Team() {
     });
   };
 
-  const addPokemon = () => {
-    setValue(
-      "pokemons",
-      [
-        {
-          name: "Bulbasaur",
-          sprites: {
-            front_default:
-              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
-          },
-          types: [
-            {
-              slot: 1,
-              type: {
-                name: "grass",
-                url: "https://pokeapi.co/api/v2/type/12/",
-              },
-            },
-            {
-              slot: 2,
-              type: {
-                name: "poison",
-                url: "https://pokeapi.co/api/v2/type/4/",
-              },
-            },
-          ],
-        },
-        {
-          name: "Bulbasaur",
-          sprites: {
-            front_default:
-              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
-          },
-          types: [
-            {
-              slot: 1,
-              type: {
-                name: "grass",
-                url: "https://pokeapi.co/api/v2/type/12/",
-              },
-            },
-            {
-              slot: 2,
-              type: {
-                name: "poison",
-                url: "https://pokeapi.co/api/v2/type/4/",
-              },
-            },
-          ],
-        },
-        {
-          name: "Bulbasaur",
-          sprites: {
-            front_default:
-              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
-          },
-          types: [
-            {
-              slot: 1,
-              type: {
-                name: "grass",
-                url: "https://pokeapi.co/api/v2/type/12/",
-              },
-            },
-            {
-              slot: 2,
-              type: {
-                name: "poison",
-                url: "https://pokeapi.co/api/v2/type/4/",
-              },
-            },
-          ],
-        },
-        {
-          name: "Bulbasaur",
-          sprites: {
-            front_default:
-              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
-          },
-          types: [
-            {
-              slot: 1,
-              type: {
-                name: "grass",
-                url: "https://pokeapi.co/api/v2/type/12/",
-              },
-            },
-            {
-              slot: 2,
-              type: {
-                name: "poison",
-                url: "https://pokeapi.co/api/v2/type/4/",
-              },
-            },
-          ],
-        },
-        {
-          name: "Bulbasaur",
-          sprites: {
-            front_default:
-              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
-          },
-          types: [
-            {
-              slot: 1,
-              type: {
-                name: "grass",
-                url: "https://pokeapi.co/api/v2/type/12/",
-              },
-            },
-            {
-              slot: 2,
-              type: {
-                name: "poison",
-                url: "https://pokeapi.co/api/v2/type/4/",
-              },
-            },
-          ],
-        },
-        {
-          name: "Bulbasaur",
-          sprites: {
-            front_default:
-              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
-          },
-          types: [
-            {
-              slot: 1,
-              type: {
-                name: "grass",
-                url: "https://pokeapi.co/api/v2/type/12/",
-              },
-            },
-            {
-              slot: 2,
-              type: {
-                name: "poison",
-                url: "https://pokeapi.co/api/v2/type/4/",
-              },
-            },
-          ],
-        },
-      ] as any,
-      {
+  const selectPokemon = (pokemon: IPokemonMini) => {
+    getPokemon(pokemon.name).then((response: AxiosResponse<IPokemon>) => {
+      const pokemons = getValues("pokemons");
+      pokemons[slotSelected] = response.data;
+      setValue("pokemons", pokemons, {
         shouldValidate: true,
         shouldTouch: true,
         shouldDirty: true,
-      }
-    );
+      });
+      let slotJumps = 0;
+      let nextSlot = 0;
+      do {
+        console.log(nextSlot, getValues("pokemons")[nextSlot]);
+        if (!getValues("pokemons")[nextSlot]?.id) {
+          break;
+        } else {
+          if (nextSlot < 5) {
+            nextSlot++;
+          } else {
+            nextSlot = 0;
+          }
+        }
+        slotJumps++;
+      } while (slotJumps < 5);
+      console.log("nextSlot", nextSlot);
+      setSlotSelected(nextSlot);
+    });
+  };
+
+  const submitTeam = () => {
+    const team: IPokeTeam = {
+      id: "1",
+      ...getValues(),
+    };
+    addTeam(team);
+    navigate("/teams");
   };
 
   return (
@@ -214,6 +122,7 @@ function Team() {
               required: true,
               minLength: 3,
               maxLength: 9,
+              validate: { alreadyExistsTeamName },
             })}
           />
           <div>
@@ -227,47 +136,29 @@ function Team() {
             {errors.name?.type == "maxLength" && (
               <span>This field is should be maximun 9 characters</span>
             )}
+            {errors.name?.type == "alreadyExistsTeamName" && (
+              <span>This team already exists</span>
+            )}
           </div>
-          <button onClick={addPokemon}>add random pokemon</button>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            {[...Array(6)].map((pokemon: IPokemon, index: number) => {
-              const pokemonEl = getValues().pokemons[index];
-              return (
-                <div key={index}>
-                  <p>
-                    #{index + 1} - {pokemonEl?.name}
-                  </p>
-                  {pokemonEl?.sprites && (
-                    <div
-                      style={{
-                        width: "100%",
-                        background: "#8d8d8d",
-                        position: "relative",
-                      }}
-                    >
-                      <img
-                        src={pokemonEl?.sprites.front_default}
-                        style={{ width: "150px" }}
-                      />
-                      <Button
-                        onClick={() => onDeletePokemon(index)}
-                        icon="pi pi-times"
-                        className="p-button-rounded p-button-danger"
-                        aria-label="Cancel"
-                        style={{
-                          position: "absolute",
-                          top: "-5px",
-                          right: "-10px",
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <div
+            style={{
+              paddingLeft: "3em",
+              paddingRight: "3em",
+            }}
+          >
+            <PokemonTeam
+              team={getValues()}
+              editable={true}
+              slotSelected={slotSelected}
+              setSlotSelected={setSlotSelected}
+              deletePokemon={onDeletePokemon}
+            ></PokemonTeam>
           </div>
-          <input type="submit" disabled={!isValid} />
+          <input type="submit" disabled={!isValid} onClick={submitTeam} />
         </form>
+        <div style={{ padding: "1em" }}>
+          <PokemonsPick selectPokemon={selectPokemon}></PokemonsPick>
+        </div>
       </div>
     </div>
   );

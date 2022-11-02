@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect, createContext } from "react";
 import axios, { AxiosResponse } from "axios";
 import {
+  IPokeTeam,
   IPokeTypeDisplay,
   IPokeTypeInfo,
   POKE_TYPE_IMAGE,
@@ -10,15 +11,22 @@ import { getTypes } from "../services/PokeApi";
 export interface PokemonContext {
   pokemonTypes: IPokeTypeDisplay[];
   loaded: boolean;
+  teams: IPokeTeam[];
+  addTeam: (team: IPokeTeam) => void;
+  deleteTeam: (team: IPokeTeam) => void;
 }
 
 export const PokemonContext = createContext<PokemonContext>({
   pokemonTypes: [],
   loaded: false,
+  teams: [],
+  addTeam: () => {},
+  deleteTeam: (team: IPokeTeam) => {},
 });
 
 export function PokemonContextProvider({ children }) {
   const [pokemonTypes, setPokemonTypes] = useState<IPokeTypeDisplay[]>([]);
+  const [teams, setTeams] = useState<IPokeTeam[]>([]);
   const [loaded, setLoaded] = useState<boolean>(false);
 
   useEffect(() => {
@@ -51,11 +59,24 @@ export function PokemonContextProvider({ children }) {
     );
   };
 
+  const addTeam = (team: IPokeTeam) => {
+    setTeams([...teams, team]);
+    debugger;
+  };
+
+  const deleteTeam = (team: IPokeTeam) => {
+    setTeams(teams.filter((team: IPokeTeam) => team.name !== team.name));
+    debugger;
+  };
+
   return (
     <PokemonContext.Provider
       value={{
         pokemonTypes,
         loaded,
+        teams,
+        addTeam,
+        deleteTeam,
       }}
     >
       {children}
