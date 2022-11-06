@@ -1,19 +1,6 @@
 import { CSSProperties, useState } from "react";
 import { Button } from "primereact/button";
-
-const getRandomImage = () => {
-  return RANDOM_IMAGES[getRandomNumber(0, RANDOM_IMAGES.length)];
-};
-
-const getRandomNumber = (min: number, max: number) => {
-  return Math.floor(Math.random() * max) + min;
-};
-
-const RANDOM_IMAGES = [
-  "https://images3.alphacoders.com/127/thumb-1920-127579.jpg",
-  "https://wallpapercave.com/wp/wp2763459.jpg",
-  "https://i.pinimg.com/originals/7b/79/65/7b79657c3574b2d64a5f0a4d9402b41d.jpg",
-];
+import { getRandomImage } from "../helpers/Helper";
 
 function Intro(props: { loading: number; disableLoadingScreen: () => void }) {
   const [randomImage] = useState(getRandomImage());

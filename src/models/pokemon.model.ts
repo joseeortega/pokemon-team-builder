@@ -20,6 +20,12 @@ export interface IPokeTeam {
   >;
 }
 
+export interface IPokeTeamRes {
+  id: string;
+  name: string;
+  pokemons: string[];
+}
+
 export interface IPokemonDisplay {
   id: number;
   name: string;

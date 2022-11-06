@@ -1,12 +1,18 @@
-import React, { useContext, useState, useEffect, createContext } from "react";
-import axios, { AxiosResponse } from "axios";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { AxiosResponse } from "axios";
 import {
+  IPokemon,
   IPokeTeam,
+  IPokeTeamEdit,
+  IPokeTeamRes,
   IPokeTypeDisplay,
   IPokeTypeInfo,
   POKE_TYPE_IMAGE,
 } from "../models/pokemon.model";
-import { getTypes } from "../services/PokeApi";
+import { getPokemon, getTypes } from "../services/PokeApi";
+import { AuthContext } from "./AuthContext";
+import { getTeamsByUser } from "../services/JSONServerApi";
+import { IUser } from "../models/user.model";
 
 export interface PokemonContext {
   pokemonTypes: IPokeTypeDisplay[];
@@ -25,6 +31,8 @@ export const PokemonContext = createContext<PokemonContext>({
 });
 
 export function PokemonContextProvider({ children }) {
+  const { userLogged } = useContext(AuthContext);
+
   const [pokemonTypes, setPokemonTypes] = useState<IPokeTypeDisplay[]>([]);
   const [teams, setTeams] = useState<IPokeTeam[]>([]);
   const [loaded, setLoaded] = useState<boolean>(false);
@@ -32,6 +40,11 @@ export function PokemonContextProvider({ children }) {
   useEffect(() => {
     fetchAllPokemonTypes();
   }, []);
+
+  useEffect(() => {
+    setLoaded(false);
+    fetchAllTeams();
+  }, [userLogged]);
 
   const fetchAllPokemonTypes = () => {
     getTypes().then(
@@ -59,14 +72,39 @@ export function PokemonContextProvider({ children }) {
     );
   };
 
+  const fetchAllTeams = () => {
+    if (userLogged) {
+      getTeamsByUser(userLogged as IUser).then(
+        (response: AxiosResponse<IPokeTeamRes[]>) => {
+          const teams: IPokeTeam[] = response.data.map((team: IPokeTeamRes) => {
+            const teamFull: IPokeTeamEdit = {
+              id: team.id,
+              name: team.name,
+              pokemons: [],
+            };
+
+            team.pokemons.forEach(async (pokemonName: string) => {
+              const pokemon: IPokemon = (
+                (await getPokemon(pokemonName)) as AxiosResponse<IPokemon>
+              ).data;
+              teamFull.pokemons.push(pokemon);
+            });
+
+            return teamFull;
+          });
+          setTeams(teams);
+          setLoaded(true);
+        }
+      );
+    }
+  };
+
   const addTeam = (team: IPokeTeam) => {
     setTeams([...teams, team]);
-    debugger;
   };
 
   const deleteTeam = (team: IPokeTeam) => {
     setTeams(teams.filter((team: IPokeTeam) => team.name !== team.name));
-    debugger;
   };
 
   return (

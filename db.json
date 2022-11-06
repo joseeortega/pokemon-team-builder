@@ -1,30 +1,25 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "6xekt0vkm9lztlyy7jwoap",
       "name": "jose.ortega",
-      "password": "aWxvdmVyZWFjdDEyMw=="
+      "password": "a2Vsb2tlSmluMTIz"
     },
     {
-      "id": 2,
-      "name": "aleix.riba",
-      "password": "aWxvdmVnaW5hMTIz"
-    },
-    {
-      "id": 3,
-      "name": "ash",
-      "password": "YmVzdHBva2Vtb250cmFpbmVyMTIz"
+      "id": "usswxvk7u1320j3o3kzme",
+      "name": "manolo",
+      "password": "c3VwZXJNYW5vbG8xMjM="
     }
   ],
   "teams": [
     {
       "id": 1,
       "name": "Best team ever",
-      "user": 1,
+      "user": "6xekt0vkm9lztlyy7jwoap",
       "pokemons": [
         "bulbasaur",
         "ivysaur",
-        "venasaur",
+        "venusaur",
         "squirtle",
         "blastoise",
         "charmander"

@@ -3,11 +3,12 @@ import { useCookies } from "react-cookie";
 import { Route, Routes } from "react-router-dom";
 import { COOKIE_NO_LOAD_SCREEN } from "../defs/constants";
 import { AppCookies } from "../models/cookie.model";
-import Home from "./Home";
 import Intro from "./Intro";
 import Teams from "./Teams";
 import CreateTeam from "./CreateTeam";
 import { PokemonContextProvider } from "../components/PokemonContext";
+import Login from "../components/Login";
+import { AuthContextProvider } from "../components/AuthContext";
 
 function LoadApp() {
   const [cookies, setCookie, removeCookie] = useCookies([
@@ -42,19 +43,22 @@ function LoadApp() {
       {loading < 100 ? (
         <Intro loading={loading} disableLoadingScreen={disableLoadingScreen} />
       ) : (
-        <PokemonContextProvider>
-          <Routes>
-            <Route
-              path="/"
-              element={<Teams enableLoadingScreen={enableLoadingScreen} />}
-            />
-            <Route
-              path="/teams"
-              element={<Teams enableLoadingScreen={enableLoadingScreen} />}
-            />
-            <Route path="/create-team" element={<CreateTeam />} />
-          </Routes>
-        </PokemonContextProvider>
+        <AuthContextProvider>
+          <PokemonContextProvider>
+            <Routes>
+              <Route
+                path="/"
+                element={<Teams enableLoadingScreen={enableLoadingScreen} />}
+              />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/teams"
+                element={<Teams enableLoadingScreen={enableLoadingScreen} />}
+              />
+              <Route path="/create-team" element={<CreateTeam />} />
+            </Routes>
+          </PokemonContextProvider>
+        </AuthContextProvider>
       )}
     </main>
   );

@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import PokemonTeam from "../components/PokemonTeam";
 import { Card } from "primereact/card";
 import TableFilterScroll from "../components/TableFilterScroll";
-import pokemonTeam from "../components/PokemonTeam";
 
 function Teams(props: { enableLoadingScreen: () => void }) {
   let navigate = useNavigate();
@@ -23,6 +22,7 @@ function Teams(props: { enableLoadingScreen: () => void }) {
   });
 
   useEffect(() => {
+    debugger;
     setTeams(pokeTeams);
   }, [pokeTeams]);
 
