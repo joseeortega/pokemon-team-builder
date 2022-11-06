@@ -1,0 +1,34 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "jose.ortega",
+      "password": "aWxvdmVyZWFjdDEyMw=="
+    },
+    {
+      "id": 2,
+      "name": "aleix.riba",
+      "password": "aWxvdmVnaW5hMTIz"
+    },
+    {
+      "id": 3,
+      "name": "ash",
+      "password": "YmVzdHBva2Vtb250cmFpbmVyMTIz"
+    }
+  ],
+  "teams": [
+    {
+      "id": 1,
+      "name": "Best team ever",
+      "user": 1,
+      "pokemons": [
+        "bulbasaur",
+        "ivysaur",
+        "venasaur",
+        "squirtle",
+        "blastoise",
+        "charmander"
+      ]
+    }
+  ]
+}
