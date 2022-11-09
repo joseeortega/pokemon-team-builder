@@ -9,12 +9,14 @@ export interface IPokemonMini {
 export interface IPokeTeamEdit {
   id?: string;
   name: string;
+  user: string;
   pokemons: IPokemon[];
 }
 
 export interface IPokeTeam {
   id: string;
   name: string;
+  user: string;
   pokemons: FixedLengthArray<
     [IPokemon, IPokemon, IPokemon, IPokemon, IPokemon, IPokemon]
   >;

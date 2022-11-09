@@ -51,12 +51,12 @@ function Teams(props: { enableLoadingScreen: () => void }) {
     const footer = (
       <span>
         <Button
-          label="Save"
-          icon="pi pi-check"
+          label="View"
+          icon="pi pi-eye"
           style={{ marginRight: ".25em" }}
         />
         <Button
-          label="Cancel"
+          label="Delete"
           icon="pi pi-times"
           className="p-button-secondary"
           onClick={() => deleteTeam(pokeTeam)}

@@ -18,13 +18,17 @@ import { AxiosResponse } from "axios";
 import { PokemonContext } from "./PokemonContext";
 import { useNavigate } from "react-router-dom";
 import PokemonTeam from "./PokemonTeam";
+import { AuthContext } from "./AuthContext";
+import { generateGuid } from "../helpers/Helper";
 
 function Team() {
   const { teams } = useContext(PokemonContext);
+  const { userLogged } = useContext(AuthContext);
 
   const [pokeTeam, setPokeTeam] = useState<IPokeTeamEdit>({
+    id: generateGuid(),
     name: "",
-    id: "",
+    user: userLogged?.id as string,
     pokemons: [],
   });
 
@@ -39,9 +43,11 @@ function Team() {
     formState: { errors, isValid },
     getValues,
     setValue,
-  } = useForm<{ name: string; pokemons: IPokemon[] }>({
+  } = useForm<IPokeTeamEdit>({
     defaultValues: {
+      id: generateGuid(),
       name: "",
+      user: userLogged?.id,
       pokemons: [],
     },
     mode: "onChange",
@@ -103,7 +109,6 @@ function Team() {
 
   const submitTeam = () => {
     const team: IPokeTeam = {
-      id: "1",
       ...getValues(),
     };
     addTeam(team);

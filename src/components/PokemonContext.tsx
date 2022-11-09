@@ -3,7 +3,6 @@ import { AxiosResponse } from "axios";
 import {
   IPokemon,
   IPokeTeam,
-  IPokeTeamEdit,
   IPokeTeamRes,
   IPokeTypeDisplay,
   IPokeTypeInfo,
@@ -11,7 +10,11 @@ import {
 } from "../models/pokemon.model";
 import { getPokemon, getTypes } from "../services/PokeApi";
 import { AuthContext } from "./AuthContext";
-import { getTeamsByUser } from "../services/JSONServerApi";
+import {
+  addTeam as addPokeTeam,
+  deleteTeam as deletePokeTeam,
+  getTeamsByUser,
+} from "../services/JSONServerApi";
 import { IUser } from "../models/user.model";
 
 export interface PokemonContext {
@@ -76,35 +79,74 @@ export function PokemonContextProvider({ children }) {
     if (userLogged) {
       getTeamsByUser(userLogged as IUser).then(
         (response: AxiosResponse<IPokeTeamRes[]>) => {
-          const teams: IPokeTeam[] = response.data.map((team: IPokeTeamRes) => {
-            const teamFull: IPokeTeamEdit = {
-              id: team.id,
-              name: team.name,
-              pokemons: [],
-            };
+          const allPokemonNames: string[] = [];
 
-            team.pokemons.forEach(async (pokemonName: string) => {
-              const pokemon: IPokemon = (
-                (await getPokemon(pokemonName)) as AxiosResponse<IPokemon>
-              ).data;
-              teamFull.pokemons.push(pokemon);
-            });
-
-            return teamFull;
+          response.data.forEach((team: IPokeTeamRes) => {
+            team.pokemons.forEach((pokemon: string) =>
+              allPokemonNames.push(pokemon)
+            );
           });
-          setTeams(teams);
-          setLoaded(true);
+
+          const uniquePokemonNames: string[] = [...new Set(allPokemonNames)];
+
+          const pokemonPromises: Promise<AxiosResponse<IPokemon>>[] =
+            uniquePokemonNames.map((pokemon: string) => getPokemon(pokemon));
+
+          Promise.all(pokemonPromises)
+            .then((values: AxiosResponse<IPokemon>[]) => {
+              const pokemonTeams: IPokeTeam[] = [];
+
+              response.data.forEach((team: IPokeTeamRes) => {
+                const pokemonTeam: IPokeTeam = {
+                  id: team.id,
+                  name: team.name,
+                  pokemons: team.pokemons.map(
+                    (pokemon: string) =>
+                      (
+                        values.find(
+                          (pokemonRes: AxiosResponse<IPokemon>) =>
+                            pokemon === pokemonRes.data.name
+                        ) as AxiosResponse<IPokemon>
+                      ).data
+                  ),
+                };
+                pokemonTeams.push(pokemonTeam);
+              });
+
+              debugger;
+              setTeams(pokemonTeams);
+              setLoaded(true);
+            })
+            .catch((reason) => {
+              console.log(reason);
+            });
         }
       );
     }
   };
 
   const addTeam = (team: IPokeTeam) => {
-    setTeams([...teams, team]);
+    const pokeTeamRes: IPokeTeamRes = {
+      ...team,
+      pokemons: team.pokemons.map((pokemon: IPokemon) => pokemon.name),
+    };
+    addPokeTeam(pokeTeamRes).then((teamRes: IPokeTeam) => {
+      debugger;
+      //TODO: error handling
+      setTeams([...teams, team]);
+    });
   };
 
   const deleteTeam = (team: IPokeTeam) => {
-    setTeams(teams.filter((team: IPokeTeam) => team.name !== team.name));
+    const pokeTeamRes: IPokeTeamRes = {
+      ...team,
+      pokemons: team.pokemons.map((pokemon: IPokemon) => pokemon.name),
+    };
+    debugger;
+    deletePokeTeam(pokeTeamRes).then((teamRes: IPokeTeam) => {
+      debugger;
+      setTeams(teams.filter((teamEl: IPokeTeam) => teamEl.name !== team.name));
+    });
   };
 
   return (
